@@ -14,7 +14,147 @@ set.seed(1234)
 ```
 
 # Glimpsing theoffice dataset
-```{r}
-
+```{r Glimpse-Dataset}
+glimpse(theoffice)
 ```
+# Fix air_date for later use.
+```{r Fix-Air-Date}
+theoffice <- theoffice %>%
+  mutate(air_date = ymd(as.character(air_date)))
+
+theoffice
+```
+# Exercise 1:
+Calculate the percentage of lines spoken by Jim, Pam, Michael, and Dwight for each episode of The Office.
+```{r E1}
+office_lines <-
+theoffice |>
+  filter(character == c("Jim", "Pam", "Michael", "Dwight")) |>
+  count(character) |>
+  mutate(per = n/sum(n))
+  
+office_lines
+```
+
+# Exercise 2:
+Identify episodes that touch on Halloween, Valentine's Day, and Christmas
+```{r E2}
+
+theoffice <- theoffice |>
+  mutate(text = tolower(text))
+
+halloween_episodes <-
+theoffice |>
+  filter(str_detect(text, "halloween")) |>
+  count(episode_name) |>
+  filter(n > 0) |>
+  mutate(halloween = 1) |>
+  select(-n)
+
+Vday_episodes <-
+theoffice |>
+  filter(str_detect(text, "valentine's day")) |>
+  count(episode_name) |>
+  filter(n > 0) |>
+  mutate(vday = 1) |>
+  select(-n)
+
+Christmas_episodes <-
+theoffice |>
+  filter(str_detect(text, "christmas")) |>
+  count(episode_name) |>
+  filter(n > 0) |>
+  mutate(Christmas = 1) |>
+  select(-n)
+
+halloween_episodes
+Vday_episodes
+Christmas_episodes
+```
+
+# Exercise 3:
+Put together a modeling dataset that includes features you've engineered. Also add an indicator variable called michael which takes the value 1 if Michael Scott (Steve Carell) was there, and 0 if not. Note: Michael Scott (Steve Carell) left the show at the end of Season 7.
+```{r E3}
+
+joined_theoffice <-
+theoffice |>
+  left_join(halloween_episodes, by = "episode_name") |>
+  left_join(Vday_episodes, by = "episode_name") |> 
+  left_join(Christmas_episodes, by = "episode_name") |>
+  replace_na(list(halloween =0, Christmas = 0, vday = 0))
+
+joined_theoffice <- joined_theoffice |>
+  mutate(michael = if_else(season < 8,1,0))
+
+joined_theoffice
+```
+
+# Exercise 4:
+Split the data into training (75%) and testing (25%)
+```{r E4}
+set.seed(1122)
+office_split <- initial_split(joined_theoffice)
+office_train <- training(office_split)
+office_test <- testing(office_split)
+```
+
+
+# Exercise 5:
+```{r E5}
+office_model <-
+linear_reg() |>
+  set_engine("lm")
+office_model
+```
+
+# Exercise 6:
+Create a recipe that updates the role of episode_name to not be a predictor, removes air_date as a predictor, and removes all zero variance predictors.
+```{r E6}
+
+office_recipe <-
+recipe(imdb_rating~., data = office_train) |>
+  update_role(episode_name, new_role = "id") |>
+  step_rm(air_date)|>
+  step_dummy(all_nominal(), -episode_name) |>
+  step_zv(all_predictors())
+
+office_recipe
+```
+
+# Exercise 7:
+Build a workflow for fitting the model specified earlier and using the recipe you developed to preprocess the data.
+```{r E7}
+office_workflow <- workflow() %>%
+  add_model(office_model) %>%
+  add_recipe(office_recipe)
+```
+
+# Exercise 8:
+Fit the model to training data and interpret a couple of the slope coefficients.
+```{r E8}
+#office_fit <- office_workflow %>%
+#  fit(data = office_train)
+
+#tidy(office_fit)
+```
+
+
+# Exercise 9:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

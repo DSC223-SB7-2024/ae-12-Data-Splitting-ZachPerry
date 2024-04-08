@@ -161,7 +161,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ✖ dplyr::lag()      masks stats::lag()
 ✖ yardstick::spec() masks readr::spec()
 ✖ recipes::step()   masks stats::step()
-• Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
+• Learn how to get started at https://www.tidymodels.org/start/</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(schrute)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
@@ -180,8 +180,287 @@ The following object is masked from 'package:dplyr':
 <section id="glimpsing-theoffice-dataset" class="level1">
 <h1>Glimpsing theoffice dataset</h1>
 <div class="cell">
-
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(theoffice)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 55,130
+Columns: 12
+$ index            &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16…
+$ season           &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+$ episode          &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+$ episode_name     &lt;chr&gt; "Pilot", "Pilot", "Pilot", "Pilot", "Pilot", "Pilot",…
+$ director         &lt;chr&gt; "Ken Kwapis", "Ken Kwapis", "Ken Kwapis", "Ken Kwapis…
+$ writer           &lt;chr&gt; "Ricky Gervais;Stephen Merchant;Greg Daniels", "Ricky…
+$ character        &lt;chr&gt; "Michael", "Jim", "Michael", "Jim", "Michael", "Micha…
+$ text             &lt;chr&gt; "All right Jim. Your quarterlies look very good. How …
+$ text_w_direction &lt;chr&gt; "All right Jim. Your quarterlies look very good. How …
+$ imdb_rating      &lt;dbl&gt; 7.6, 7.6, 7.6, 7.6, 7.6, 7.6, 7.6, 7.6, 7.6, 7.6, 7.6…
+$ total_votes      &lt;int&gt; 3706, 3706, 3706, 3706, 3706, 3706, 3706, 3706, 3706,…
+$ air_date         &lt;chr&gt; "2005-03-24", "2005-03-24", "2005-03-24", "2005-03-24…</code></pre>
 </div>
+</div>
+</section>
+<section id="fix-air_date-for-later-use." class="level1">
+<h1>Fix air_date for later use.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>theoffice <span class="ot">&lt;-</span> theoffice <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">air_date =</span> <span class="fu">ymd</span>(<span class="fu">as.character</span>(air_date)))</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>theoffice</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 55,130 × 12
+   index season episode episode_name director   writer           character text 
+   &lt;int&gt;  &lt;int&gt;   &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;            &lt;chr&gt;     &lt;chr&gt;
+ 1     1      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   All …
+ 2     2      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Jim       Oh, …
+ 3     3      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   So y…
+ 4     4      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Jim       Actu…
+ 5     5      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   All …
+ 6     6      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   Yes,…
+ 7     7      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   I've…
+ 8     8      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Pam       Well…
+ 9     9      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   If y…
+10    10      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Pam       What?
+# ℹ 55,120 more rows
+# ℹ 4 more variables: text_w_direction &lt;chr&gt;, imdb_rating &lt;dbl&gt;,
+#   total_votes &lt;int&gt;, air_date &lt;date&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="exercise-1" class="level1">
+<h1>Exercise 1:</h1>
+<p>Calculate the percentage of lines spoken by Jim, Pam, Michael, and Dwight for each episode of The Office.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>office_lines <span class="ot">&lt;-</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>theoffice <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(character <span class="sc">==</span> <span class="fu">c</span>(<span class="st">"Jim"</span>, <span class="st">"Pam"</span>, <span class="st">"Michael"</span>, <span class="st">"Dwight"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(character) <span class="sc">|&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">per =</span> n<span class="sc">/</span><span class="fu">sum</span>(n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There was 1 warning in `filter()`.
+ℹ In argument: `character == c("Jim", "Pam", "Michael", "Dwight")`.
+Caused by warning in `character == c("Jim", "Pam", "Michael", "Dwight")`:
+! longer object length is not a multiple of shorter object length</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>office_lines</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  character     n   per
+  &lt;chr&gt;     &lt;int&gt; &lt;dbl&gt;
+1 Dwight     1714 0.237
+2 Jim        1591 0.220
+3 Michael    2689 0.372
+4 Pam        1239 0.171</code></pre>
+</div>
+</div>
+</section>
+<section id="exercise-2" class="level1">
+<h1>Exercise 2:</h1>
+<p>Identify episodes that touch on Halloween, Valentine’s Day, and Christmas</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>theoffice <span class="ot">&lt;-</span> theoffice <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">tolower</span>(text))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>halloween_episodes <span class="ot">&lt;-</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>theoffice <span class="sc">|&gt;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(text, <span class="st">"halloween"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(episode_name) <span class="sc">|&gt;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">halloween =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>Vday_episodes <span class="ot">&lt;-</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>theoffice <span class="sc">|&gt;</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(text, <span class="st">"valentine's day"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(episode_name) <span class="sc">|&gt;</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">vday =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>Christmas_episodes <span class="ot">&lt;-</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>theoffice <span class="sc">|&gt;</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(text, <span class="st">"christmas"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(episode_name) <span class="sc">|&gt;</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Christmas =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>halloween_episodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   episode_name        halloween
+   &lt;chr&gt;                   &lt;dbl&gt;
+ 1 Costume Contest             1
+ 2 Diwali                      1
+ 3 Employee Transfer           1
+ 4 Fun Run (Parts 1&amp;2)         1
+ 5 Halloween                   1
+ 6 Here Comes Treble           1
+ 7 Koi Pond                    1
+ 8 Promos                      1
+ 9 Spooked                     1
+10 Welcome Party               1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>Vday_episodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  episode_name                  vday
+  &lt;chr&gt;                        &lt;dbl&gt;
+1 Blood Drive                      1
+2 Couples Discount                 1
+3 PDA                              1
+4 Special Project                  1
+5 The Manager and the Salesman     1
+6 Valentine's Day                  1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>Christmas_episodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 34 × 2
+   episode_name                     Christmas
+   &lt;chr&gt;                                &lt;dbl&gt;
+ 1 A Benihana Christmas (Parts 1&amp;2)         1
+ 2 Branch Closing                           1
+ 3 Business Trip                            1
+ 4 Cafe Disco                               1
+ 5 Casino Night                             1
+ 6 Christening                              1
+ 7 Christmas Party                          1
+ 8 Christmas Wishes                         1
+ 9 Classy Christmas (Parts 1&amp;2)             1
+10 Cocktails                                1
+# ℹ 24 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="exercise-3" class="level1">
+<h1>Exercise 3:</h1>
+<p>Put together a modeling dataset that includes features you’ve engineered. Also add an indicator variable called michael which takes the value 1 if Michael Scott (Steve Carell) was there, and 0 if not. Note: Michael Scott (Steve Carell) left the show at the end of Season 7.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>joined_theoffice <span class="ot">&lt;-</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>theoffice <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(halloween_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Vday_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Christmas_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">halloween =</span><span class="dv">0</span>, <span class="at">Christmas =</span> <span class="dv">0</span>, <span class="at">vday =</span> <span class="dv">0</span>))</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>joined_theoffice <span class="ot">&lt;-</span> joined_theoffice <span class="sc">|&gt;</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">michael =</span> <span class="fu">if_else</span>(season <span class="sc">&lt;</span> <span class="dv">8</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>joined_theoffice</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 55,130 × 16
+   index season episode episode_name director   writer           character text 
+   &lt;int&gt;  &lt;int&gt;   &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;            &lt;chr&gt;     &lt;chr&gt;
+ 1     1      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   all …
+ 2     2      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Jim       oh, …
+ 3     3      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   so y…
+ 4     4      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Jim       actu…
+ 5     5      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   all …
+ 6     6      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   yes,…
+ 7     7      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   i've…
+ 8     8      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Pam       well…
+ 9     9      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   if y…
+10    10      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Pam       what?
+# ℹ 55,120 more rows
+# ℹ 8 more variables: text_w_direction &lt;chr&gt;, imdb_rating &lt;dbl&gt;,
+#   total_votes &lt;int&gt;, air_date &lt;date&gt;, halloween &lt;dbl&gt;, vday &lt;dbl&gt;,
+#   Christmas &lt;dbl&gt;, michael &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="exercise-4" class="level1">
+<h1>Exercise 4:</h1>
+<p>Split the data into training (75%) and testing (25%)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1122</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>office_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(joined_theoffice)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>office_train <span class="ot">&lt;-</span> <span class="fu">training</span>(office_split)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>office_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(office_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exercise-5" class="level1">
+<h1>Exercise 5:</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>office_model <span class="ot">&lt;-</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>office_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear Regression Model Specification (regression)
+
+Computational engine: lm </code></pre>
+</div>
+</div>
+</section>
+<section id="exercise-6" class="level1">
+<h1>Exercise 6:</h1>
+<p>Create a recipe that updates the role of episode_name to not be a predictor, removes air_date as a predictor, and removes all zero variance predictors.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>office_recipe <span class="ot">&lt;-</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">recipe</span>(imdb_rating<span class="sc">~</span>., <span class="at">data =</span> office_train) <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(episode_name, <span class="at">new_role =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(air_date)<span class="sc">|&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal</span>(), <span class="sc">-</span>episode_name) <span class="sc">|&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>office_recipe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Recipe ──────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Inputs </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Number of variables by role</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>outcome:    1
+predictor: 14
+id:         1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Operations </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Variables removed: air_date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Dummy variables from: all_nominal() and -episode_name</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Zero variance filter on: all_predictors()</code></pre>
+</div>
+</div>
+</section>
+<section id="exercise-7" class="level1">
+<h1>Exercise 7:</h1>
+<p>Build a workflow for fitting the model specified earlier and using the recipe you developed to preprocess the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>office_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(office_model) <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(office_recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exercise-8" class="level1">
+<h1>Exercise 8:</h1>
+<p>Fit the model to training data and interpret a couple of the slope coefficients.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#office_fit &lt;- office_workflow %&gt;%</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  fit(data = office_train)</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co">#tidy(office_fit)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exercise-9" class="level1">
+<h1>Exercise 9:</h1>
 </section>
 
 </main>
