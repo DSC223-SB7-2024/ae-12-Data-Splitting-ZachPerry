@@ -3,7 +3,9 @@ title: "AE-12 Zach Perry"
 author: "Zachary Perry"
 ---
 
+
 # Setup
+
 ```{r Loading-Packages}
 library(tidyverse)
 library(tidymodels)
@@ -13,19 +15,25 @@ library(kableExtra)
 set.seed(1234)
 ```
 
+
 # Glimpsing theoffice dataset
+
 ```{r Glimpse-Dataset}
 glimpse(theoffice)
 ```
+
 # Fix air_date for later use.
+
 ```{r Fix-Air-Date}
 theoffice <- theoffice %>%
   mutate(air_date = ymd(as.character(air_date)))
 
 theoffice
 ```
+
 # Exercise 1:
 Calculate the percentage of lines spoken by Jim, Pam, Michael, and Dwight for each episode of The Office.
+
 ```{r E1}
 office_lines <-
 theoffice |>
@@ -36,8 +44,10 @@ theoffice |>
 office_lines
 ```
 
+
 # Exercise 2:
 Identify episodes that touch on Halloween, Valentine's Day, and Christmas
+
 ```{r E2}
 
 theoffice <- theoffice |>
@@ -72,8 +82,10 @@ Vday_episodes
 Christmas_episodes
 ```
 
+
 # Exercise 3:
 Put together a modeling dataset that includes features you've engineered. Also add an indicator variable called michael which takes the value 1 if Michael Scott (Steve Carell) was there, and 0 if not. Note: Michael Scott (Steve Carell) left the show at the end of Season 7.
+
 ```{r E3}
 
 joined_theoffice <-
@@ -89,8 +101,10 @@ joined_theoffice <- joined_theoffice |>
 joined_theoffice
 ```
 
+
 # Exercise 4:
 Split the data into training (75%) and testing (25%)
+
 ```{r E4}
 set.seed(1122)
 office_split <- initial_split(joined_theoffice)
@@ -99,7 +113,9 @@ office_test <- testing(office_split)
 ```
 
 
+
 # Exercise 5:
+
 ```{r E5}
 office_model <-
 linear_reg() |>
@@ -107,8 +123,10 @@ linear_reg() |>
 office_model
 ```
 
+
 # Exercise 6:
 Create a recipe that updates the role of episode_name to not be a predictor, removes air_date as a predictor, and removes all zero variance predictors.
+
 ```{r E6}
 
 office_recipe <-
@@ -121,16 +139,20 @@ recipe(imdb_rating~., data = office_train) |>
 office_recipe
 ```
 
+
 # Exercise 7:
 Build a workflow for fitting the model specified earlier and using the recipe you developed to preprocess the data.
+
 ```{r E7}
 office_workflow <- workflow() %>%
   add_model(office_model) %>%
   add_recipe(office_recipe)
 ```
 
+
 # Exercise 8:
 Fit the model to training data and interpret a couple of the slope coefficients.
+
 ```{r E8}
 office_fit <- office_workflow %>%
   fit(data = office_train)
@@ -139,7 +161,9 @@ tidy(office_fit)
 ```
 
 
+
 # Exercise 9:
+
 
 
 
