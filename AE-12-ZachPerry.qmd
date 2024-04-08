@@ -3,4 +3,18 @@ title: "AE-12 Zach Perry"
 author: "Zachary Perry"
 ---
 
+# Setup
+```{r Loading-Packages}
+library(tidyverse)
+library(tidymodels)
+library(schrute)
+library(lubridate)
+library(kableExtra)
+set.seed(1234)
+```
+
+# Glimpsing theoffice dataset
+```{r}
+
+```
 
