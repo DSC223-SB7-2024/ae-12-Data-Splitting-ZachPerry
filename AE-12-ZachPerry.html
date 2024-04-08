@@ -161,7 +161,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ✖ dplyr::lag()      masks stats::lag()
 ✖ yardstick::spec() masks readr::spec()
 ✖ recipes::step()   masks stats::step()
-• Learn how to get started at https://www.tidymodels.org/start/</code></pre>
+• Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(schrute)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
@@ -337,33 +337,32 @@ Caused by warning in `character == c("Jim", "Pam", "Michael", "Dwight")`:
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>joined_theoffice <span class="ot">&lt;-</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>theoffice <span class="sc">|&gt;</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(halloween_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Vday_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Christmas_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">halloween =</span><span class="dv">0</span>, <span class="at">Christmas =</span> <span class="dv">0</span>, <span class="at">vday =</span> <span class="dv">0</span>))</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>joined_theoffice <span class="ot">&lt;-</span> joined_theoffice <span class="sc">|&gt;</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">michael =</span> <span class="fu">if_else</span>(season <span class="sc">&lt;</span> <span class="dv">8</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>joined_theoffice</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(season, episode, episode_name, total_votes, imdb_rating, air_date) <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(halloween_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Vday_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Christmas_episodes, <span class="at">by =</span> <span class="st">"episode_name"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">halloween =</span><span class="dv">0</span>, <span class="at">Christmas =</span> <span class="dv">0</span>, <span class="at">vday =</span> <span class="dv">0</span>))</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>joined_theoffice2 <span class="ot">&lt;-</span> joined_theoffice <span class="sc">|&gt;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">michael =</span> <span class="fu">if_else</span>(season <span class="sc">&lt;</span> <span class="dv">8</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>joined_theoffice2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 55,130 × 16
-   index season episode episode_name director   writer           character text 
-   &lt;int&gt;  &lt;int&gt;   &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;            &lt;chr&gt;     &lt;chr&gt;
- 1     1      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   all …
- 2     2      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Jim       oh, …
- 3     3      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   so y…
- 4     4      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Jim       actu…
- 5     5      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   all …
- 6     6      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   yes,…
- 7     7      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   i've…
- 8     8      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Pam       well…
- 9     9      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Michael   if y…
-10    10      1       1 Pilot        Ken Kwapis Ricky Gervais;S… Pam       what?
+<pre><code># A tibble: 55,130 × 10
+   season episode episode_name total_votes imdb_rating air_date   halloween
+    &lt;int&gt;   &lt;int&gt; &lt;chr&gt;              &lt;int&gt;       &lt;dbl&gt; &lt;date&gt;         &lt;dbl&gt;
+ 1      1       1 Pilot               3706         7.6 2005-03-24         0
+ 2      1       1 Pilot               3706         7.6 2005-03-24         0
+ 3      1       1 Pilot               3706         7.6 2005-03-24         0
+ 4      1       1 Pilot               3706         7.6 2005-03-24         0
+ 5      1       1 Pilot               3706         7.6 2005-03-24         0
+ 6      1       1 Pilot               3706         7.6 2005-03-24         0
+ 7      1       1 Pilot               3706         7.6 2005-03-24         0
+ 8      1       1 Pilot               3706         7.6 2005-03-24         0
+ 9      1       1 Pilot               3706         7.6 2005-03-24         0
+10      1       1 Pilot               3706         7.6 2005-03-24         0
 # ℹ 55,120 more rows
-# ℹ 8 more variables: text_w_direction &lt;chr&gt;, imdb_rating &lt;dbl&gt;,
-#   total_votes &lt;int&gt;, air_date &lt;date&gt;, halloween &lt;dbl&gt;, vday &lt;dbl&gt;,
-#   Christmas &lt;dbl&gt;, michael &lt;dbl&gt;</code></pre>
+# ℹ 3 more variables: vday &lt;dbl&gt;, Christmas &lt;dbl&gt;, michael &lt;dbl&gt;</code></pre>
 </div>
 </div>
 </section>
@@ -372,18 +371,37 @@ Caused by warning in `character == c("Jim", "Pam", "Michael", "Dwight")`:
 <p>Split the data into training (75%) and testing (25%)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1122</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>office_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(joined_theoffice)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>office_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(joined_theoffice2)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>office_train <span class="ot">&lt;-</span> <span class="fu">training</span>(office_split)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>office_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(office_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>office_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(office_split)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>office_train</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 41,347 × 10
+   season episode episode_name      total_votes imdb_rating air_date   halloween
+    &lt;int&gt;   &lt;int&gt; &lt;chr&gt;                   &lt;int&gt;       &lt;dbl&gt; &lt;date&gt;         &lt;dbl&gt;
+ 1      1       4 The Alliance             2886         8.1 2005-04-12         0
+ 2      3       8 The Merger               2376         8.7 2006-11-16         0
+ 3      6      16 The Manager and …        1670         8.1 2010-02-11         0
+ 4      3      17 Business School          2622         8.8 2007-02-15         0
+ 5      1       1 Pilot                    3706         7.6 2005-03-24         0
+ 6      2      18 Take Your Daught…        2415         8.3 2006-03-16         0
+ 7      7      17 Threat Level Mid…        3525         9.3 2011-02-17         0
+ 8      8      23 Turf War                 1393         7.7 2012-05-03         0
+ 9      3      10 A Benihana Chris…        2541         8.7 2006-12-14         0
+10      4       9 Local Ad                 2388         8.8 2007-10-25         0
+# ℹ 41,337 more rows
+# ℹ 3 more variables: vday &lt;dbl&gt;, Christmas &lt;dbl&gt;, michael &lt;dbl&gt;</code></pre>
+</div>
 </div>
 </section>
 <section id="exercise-5" class="level1">
 <h1>Exercise 5:</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>office_model <span class="ot">&lt;-</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>office_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>office_model <span class="ot">&lt;-</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>office_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear Regression Model Specification (regression)
 
@@ -395,14 +413,14 @@ Computational engine: lm </code></pre>
 <h1>Exercise 6:</h1>
 <p>Create a recipe that updates the role of episode_name to not be a predictor, removes air_date as a predictor, and removes all zero variance predictors.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>office_recipe <span class="ot">&lt;-</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">recipe</span>(imdb_rating<span class="sc">~</span>., <span class="at">data =</span> office_train) <span class="sc">|&gt;</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(episode_name, <span class="at">new_role =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(air_date)<span class="sc">|&gt;</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal</span>(), <span class="sc">-</span>episode_name) <span class="sc">|&gt;</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>())</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>office_recipe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>office_recipe <span class="ot">&lt;-</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">recipe</span>(imdb_rating<span class="sc">~</span>., <span class="at">data =</span> office_train) <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(episode_name, <span class="at">new_role =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(air_date)<span class="sc">|&gt;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal</span>(), <span class="sc">-</span>episode_name) <span class="sc">|&gt;</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>office_recipe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -419,9 +437,9 @@ Computational engine: lm </code></pre>
 <pre><code>Number of variables by role</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>outcome:    1
-predictor: 14
-id:         1</code></pre>
+<pre><code>outcome:   1
+predictor: 8
+id:        1</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
@@ -444,23 +462,41 @@ id:         1</code></pre>
 <h1>Exercise 7:</h1>
 <p>Build a workflow for fitting the model specified earlier and using the recipe you developed to preprocess the data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>office_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(office_model) <span class="sc">%&gt;%</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(office_recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>office_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(office_model) <span class="sc">%&gt;%</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(office_recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exercise-8" class="level1">
 <h1>Exercise 8:</h1>
 <p>Fit the model to training data and interpret a couple of the slope coefficients.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#office_fit &lt;- office_workflow %&gt;%</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  fit(data = office_train)</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co">#tidy(office_fit)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>office_fit <span class="ot">&lt;-</span> office_workflow <span class="sc">%&gt;%</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> office_train)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(office_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 5
+  term         estimate  std.error statistic   p.value
+  &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)  6.82     0.0117         584.  0        
+2 season       0.0275   0.00113         24.3 1.79e-129
+3 episode      0.0103   0.000244        42.2 0        
+4 total_votes  0.000384 0.00000209     184.  0        
+5 halloween   -0.129    0.00755        -17.1 1.07e- 65
+6 vday        -0.129    0.00997        -12.9 5.48e- 38
+7 Christmas    0.166    0.00443         37.5 2.63e-302
+8 michael      0.461    0.00589         78.3 0        </code></pre>
 </div>
+</div>
+<section id="interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation">Interpretation:</h3>
+<p>Coefficients: - season: the coefficient is 0.0542 which means for every 1 increase in season, the rating increases by 0.0542. -</p>
+</section>
 </section>
 <section id="exercise-9" class="level1">
 <h1>Exercise 9:</h1>
+<p>Use your model to make predictions for testing data and calculate the R2 and the RMSE.</p>
 </section>
 
 </main>

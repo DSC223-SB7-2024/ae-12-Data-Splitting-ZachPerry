@@ -78,24 +78,28 @@ Put together a modeling dataset that includes features you've engineered. Also a
 
 joined_theoffice <-
 theoffice |>
+  select(season, episode, episode_name, total_votes, imdb_rating, air_date) |>
   left_join(halloween_episodes, by = "episode_name") |>
   left_join(Vday_episodes, by = "episode_name") |> 
   left_join(Christmas_episodes, by = "episode_name") |>
   replace_na(list(halloween =0, Christmas = 0, vday = 0))
 
-joined_theoffice <- joined_theoffice |>
+joined_theoffice2 <- joined_theoffice |>
   mutate(michael = if_else(season < 8,1,0))
 
-joined_theoffice
+joined_theoffice2
 ```
 
 # Exercise 4:
 Split the data into training (75%) and testing (25%)
 ```{r E4}
 set.seed(1122)
-office_split <- initial_split(joined_theoffice)
+office_split <- initial_split(joined_theoffice2)
 office_train <- training(office_split)
 office_test <- testing(office_split)
+
+office_train
+
 ```
 
 
@@ -138,9 +142,13 @@ office_fit <- office_workflow %>%
 tidy(office_fit)
 ```
 
+### Interpretation:
+Coefficients:
+- season: the coefficient is 0.0542 which means for every 1 increase in season, the rating increases by 0.0542.
+- 
 
 # Exercise 9:
-
+Use your model to make predictions for testing data and calculate the R2 and the RMSE.
 
 
 
