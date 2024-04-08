@@ -144,11 +144,21 @@ tidy(office_fit)
 
 ### Interpretation:
 Coefficients:
-- season: the coefficient is 0.0542 which means for every 1 increase in season, the rating increases by 0.0542.
-- 
+- season: the coefficient is 0.02749 which means for every 1 increase in season, the rating increases by 0.02749.
+- halloween and vday: is about -.13 which means that if an episode mentions halloween or valentines day, that episodes rating drops by around .13.
+- michael: has a coefficient of around .46 meaning that for everytime an episode has michael in it, its rating increases by .46.
 
 # Exercise 9:
 Use your model to make predictions for testing data and calculate the R2 and the RMSE.
+```{r E9}
+office_test_pred <- predict(office_fit, new_data = office_test) |>
+  bind_cols(office_test |> select(imdb_rating, episode_name))
+
+rmse(office_test_pred, truth = imdb_rating, estimate = .pred)
+```
+```{r}
+rsq(office_test_pred, truth = imdb_rating, estimate = .pred)
+```
 
 
 
